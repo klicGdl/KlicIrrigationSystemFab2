@@ -129,6 +129,14 @@ void setup()
   display->clearScreen();
   display->display();
   delete display;
+
+  display = new ILI9341Display(SPI_CS, SPI_DC);
+  RUN_TEST(testInitAndLogo);
+  RUN_TEST(testDrawLine);
+  RUN_TEST(testWriting);
+  display->clearScreen();
+  display->display();
+  delete display;
   UNITY_END();
 }
 

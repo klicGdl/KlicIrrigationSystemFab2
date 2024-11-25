@@ -2,11 +2,31 @@
 
 #include <Arduino.h>
 
+#include <Wire.h>
+#include <SPI.h>
+#include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_ST7735.h> // Hardware-specific library for ST7735
 #include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
+#include <Adafruit_ILI9341.h>
 
 #include "DisplayConsts.h"
+
+#ifndef SPI_SCK
+#define SPI_SCK 18
+#endif
+#ifndef SPI_MISO
+#define SPI_MISO 19 // Data command
+#endif
+#ifndef SPI_DC
+#define SPI_DC 19 // Data Command
+#endif
+#ifndef SPI_MOSI
+#define SPI_MOSI 23
+#endif
+#ifndef SPI_CS
+#define SPI_CS 5
+#endif
 
 #define IDISPLAY_BLACK ST77XX_BLACK
 #define IDISPLAY_WHITE ST77XX_WHITE

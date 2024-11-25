@@ -1,11 +1,6 @@
 #pragma once
 
 #include <Arduino.h>
-#include <SPI.h>
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_ST7735.h> // Hardware-specific library for ST7735
-#include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
 
 #include "DisplayConsts.h"
 #include "IDisplay.h"
