@@ -2,9 +2,12 @@
 
 #include "main.h"
 
+#ifndef TFT_RESET
 #define TFT_RESET -1 // Reset pin # (or -1 if sharing Arduino reset pin)
+#endif
 
-Adafruit_ST7735 display(SPI_CS, SPI_DC, SPI_MOSI, SPI_SCK, TFT_RESET);
+//Adafruit_ST7735 display(SPI_CS, SPI_DC, SPI_MOSI, SPI_SCK, TFT_RESET);
+TFT_eSPI display = TFT_eSPI();
 Keyboard kbrd;
 Menu menu(&display, &kbrd);
 
@@ -19,7 +22,8 @@ void setup()
     Serial.begin(115200);
 
     UNITY_BEGIN();
-    display.initR(INITR_BLACKTAB);
+    display.begin();
+    //display.initR(INITR_BLACKTAB);
     display.fillScreen(ST7735_BLACK);
     RUN_TEST(testMenus);
     display.fillScreen(ST7735_BLACK);

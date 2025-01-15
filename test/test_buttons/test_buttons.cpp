@@ -2,7 +2,8 @@
 
 #include "main.h"
 
-IDisplay *display;
+TFT_eSPI *display;
+//Adafruit_ST7735 *display;
 Keyboard kbrd;
 
 bool prev_state[MAX_BUTTONS] = {1, 1, 1, 1, 1};
@@ -18,17 +19,16 @@ void update_display_message_by_row(uint8_t row, bool state)
     {
         display->setTextSize(1);
         display->setCursor(0, y_pos);
-        display->setTextColor(IDISPLAY_BLACK);
-        display->fillRect(0, y_pos, display->width(), 8, IDISPLAY_BLACK);
+        display->setTextColor(TFT_BLACK);
+        display->fillRect(0, y_pos, display->width(), 8, TFT_BLACK);
         display->setCursor(0, y_pos);
-        display->setTextColor(IDISPLAY_BLUE);
+        display->setTextColor(TFT_BLUE);
         display->print("Button ");
-        display->setTextColor(IDISPLAY_CYAN);
+        display->setTextColor(TFT_CYAN);
         display->print(selectedButton[row]);
         display->setCursor(x_pos, y_pos);
-        display->setTextColor(IDISPLAY_RED);
+        display->setTextColor(TFT_RED);
         display->print("pressed");
-        display->display();
         Serial.printf("Button %s pressed \n", selectedButton[row]);
         prev_state[row] = 1;
         timeSincePressed[row] = millis();
@@ -37,21 +37,19 @@ void update_display_message_by_row(uint8_t row, bool state)
     {
         display->setTextSize(1);
         display->setCursor(0, y_pos);
-        display->setTextColor(IDISPLAY_BLACK);
-        display->fillRect(0, y_pos, display->width(), 8, IDISPLAY_BLACK);
+        display->setTextColor(TFT_BLACK);
+        display->fillRect(0, y_pos, display->width(), 8, TFT_BLACK);
         display->setCursor(0, y_pos);
-        display->setTextColor(IDISPLAY_BLUE);
+        display->setTextColor(TFT_BLUE);
         display->print("Button ");
-        display->setTextColor(IDISPLAY_CYAN);
+        display->setTextColor(TFT_CYAN);
         display->print(selectedButton[row]);
         display->setCursor(x_pos, y_pos);
-        display->setTextColor(IDISPLAY_GREEN);
+        display->setTextColor(TFT_GREEN);
         display->print("released");
-        display->display();
         Serial.printf("Button %s released \n", selectedButton[row]);
         prev_state[row] = 0;
     }
-    display->display();
 }
 
 void test_button_press()
@@ -71,15 +69,15 @@ void test_button_press()
 void setup()
 {
     Serial.begin(115200);
-    display = new ST7735Display(SPI_CS, SPI_DC, SPI_MOSI, SPI_SCK, -1);
-    display->init();
-    display->clearScreen();
-    display->display();
+    display = new TFT_eSPI();
+    //display = new Adafruit_ST7735(SPI_CS, SPI_DC, SPI_MOSI, SPI_SCK, -1);
+    //display->initR();
+    display->fillScreen(TFT_BLACK);
 
     UNITY_BEGIN();
 }
 
-void loop()
+void loop() 
 {
     RUN_TEST(test_button_press);
 

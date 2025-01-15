@@ -4,8 +4,6 @@
 // required libraries
 #include "menu_manager.h"
 #include "../buttons/keyboard.h"
-#include <Adafruit_ST7735.h>
-// #include "../Display/IDisplay.h"
 
 // pins select button on encoder
 #define CS_PIN 5
