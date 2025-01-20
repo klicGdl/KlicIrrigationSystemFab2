@@ -17,6 +17,8 @@ Menu::Menu(TFT_eSPI *D, Keyboard *b)
   Zone4Menu = new EditMenu(Display);
 
   SensorsMenu = new EditMenu(Display);
+
+  TimeDateMenu = new EditMenu(Display);
 }
 
 Menu::~Menu()
@@ -30,7 +32,55 @@ Menu::~Menu()
   delete (Zone4Menu);
 
   delete (SensorsMenu);
+
+  delete (TimeDateMenu);
 }
+
+void Menu::ProcessTimeAndDate()
+{
+  // set an inital flag that will be used to store what menu item the user exited on
+  int TimeandDateMenuOption = 1;
+
+  // blank out the screen
+  Display->fillScreen(MENU_BACKGROUND);
+
+  TimeDateMenu->draw();
+  
+  // run the processing loop until user move selector to title bar (which becomes exit)
+  // and selectes it
+  while (TimeandDateMenuOption != 0)
+  {
+
+    btn->update_buttons();
+    if (btn->button_Up.pressed())
+    {
+      TimeDateMenu->MoveUp();
+    }
+    // Check down
+    if (btn->button_Down.pressed())
+    {
+      TimeDateMenu->MoveDown();
+    }
+
+    // but wait...the user pressed the button on the encoder
+    if (btn->button_Enter.pressed())
+    {
+      TimeandDateMenuOption = TimeDateMenu->selectRow();
+    }
+  }
+
+  // out of menu now time for processing
+
+  // save value
+  this->timeAndDate.tm_hour = TimeDateMenu->value[hourID];
+  this->timeAndDate.tm_min = TimeDateMenu->value[minID];
+  this->timeAndDate.tm_sec = TimeDateMenu->value[secID];
+  this->timeAndDate.tm_mday = TimeDateMenu->value[dayID];
+  this->timeAndDate.tm_mon = TimeDateMenu->value[monthID];
+  this->timeAndDate.tm_year = TimeDateMenu->value[yearID] - 1900;
+  
+}
+
 
 void Menu::ProcessSensors()
 {
@@ -152,7 +202,7 @@ void Menu::ProcessZone(int zone)
 
   Serial.println("Configuration");
   Serial.printf("Zone %d = 0x%X\n", zone + 1, this->days[zone]);
-  Serial.printf("%02d:%02d - %d(%d)\n",this->hour[zone],this->minute[zone],this->duration[zone],(this->duration[zone]/60));
+  Serial.printf("%02d:%02d - %d(%d)\n", this->hour[zone], this->minute[zone], this->duration[zone], (this->duration[zone] / 60));
 }
 
 void Menu::ProcessConfMenu()
@@ -214,6 +264,12 @@ void Menu::ProcessConfMenu()
       if (ConfMenuOption == ConfigurationSensors)
       { // Sensors item
         ProcessSensors();
+        Display->fillScreen(MENU_BACKGROUND);
+        ConfigurationMenu->draw();
+      }
+      if (ConfMenuOption == ConfigurationTimeandDate)
+      { // Time and Date
+        ProcessTimeAndDate();
         Display->fillScreen(MENU_BACKGROUND);
         ConfigurationMenu->draw();
       }
@@ -291,9 +347,9 @@ void Menu::MenusSetup()
 {
 
   // Display->begin();
-  //Display->initR(INITR_BLACKTAB);
+  // Display->initR(INITR_BLACKTAB);
   Display->begin();
-  Display->fillScreen(TFT_BGR);// ST7735_BLACK);
+  Display->fillScreen(TFT_BGR); // ST7735_BLACK);
   Display->setRotation(0);
   Display->setTextSize(1);
   /*
@@ -344,6 +400,7 @@ void Menu::MenusSetup()
   ConfigurationZone3 = ConfigurationMenu->addNI("Zone3");
   ConfigurationZone4 = ConfigurationMenu->addNI("Zone4");
   ConfigurationSensors = ConfigurationMenu->addNI("Sensors");
+  ConfigurationTimeandDate = ConfigurationMenu->addNI("Time and Date");
 
   ConfigurationMenu->setMenuBarMargins(0, Display->width(), BORDERRADIUS, BORDERTHICKNESS);
   // setTitleColors(TitleTextColor, TitleFillColor);
@@ -459,6 +516,22 @@ void Menu::MenusSetup()
   SensorsMenu->setItemTextMargins(LEFTMARGIN, TOPMARGIN, MARGINBETWEENTITLEBARANDMENU);
   SensorsMenu->setItemColors(MENU_DISABLE, MENU_HIGHBORDER, MENU_SELECTBORDER);
 
+  //-------------------------- Time and Date-------------------------------------------------
+  TimeDateMenu->init(MENU_TEXT, MENU_BACKGROUND, MENU_HIGHLIGHTTEXT, MENU_HIGHLIGHT, MENU_SELECTTEXT, MENU_SELECT, DATA_COLUMN - 20, ROW_HEIGHT, ROWS, "Time & Date");
+  hourID = TimeDateMenu->addNI("Hour", timeAndDate.tm_hour, 0, 23, 1, 0, NULL);
+  minID = TimeDateMenu->addNI("Minute", timeAndDate.tm_min, 0, 59, 1, 0, NULL);
+  secID = TimeDateMenu->addNI("Seconds", timeAndDate.tm_sec, 0, 59, 1, 0, NULL);
+  dayID = TimeDateMenu->addNI("Day", timeAndDate.tm_mday, 1, 31, 1, 0, NULL);
+  monthID = TimeDateMenu->addNI("Month", timeAndDate.tm_mon, 1, 12, 1, 0, NULL);
+  yearID = TimeDateMenu->addNI("Year", timeAndDate.tm_year + 1900, 2025, 2040, 1, 0, NULL);
+
+  TimeDateMenu->setMenuBarMargins(0, Display->width(), BORDERRADIUS, BORDERTHICKNESS);
+  TimeDateMenu->setTitleColors(TITLE_TEXT, TITLE_BACK);
+  TimeDateMenu->setTitleBarSize(0, 0, Display->width(), TITLE_HEIGHT);
+  TimeDateMenu->setTitleTextMargins((Display->width() - (sizeof("Time & Date") * 6)) / 2, TITLE_TOP_MARGIN);
+  TimeDateMenu->setItemTextMargins(LEFTMARGIN, TOPMARGIN, MARGINBETWEENTITLEBARANDMENU);
+  TimeDateMenu->setItemColors(MENU_DISABLE, MENU_HIGHBORDER, MENU_SELECTBORDER);
+
   //-----------------------------------------------------------------------------
 
   ProcessMainMenu();
@@ -543,8 +616,12 @@ bool Menu::getZoneConfRain()
   return this->_rainSensor;
 }
 
-// if the mode is false, it does not run the menus
-void Menu::setMenuMode(bool m)
+void Menu::setTime(tm t)
 {
-  this->MenuMode = m;
+  this->timeAndDate = t;
+}
+
+tm Menu::getTime()
+{
+  return this->timeAndDate;
 }

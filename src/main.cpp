@@ -1,13 +1,13 @@
 #ifndef PIO_UNIT_TESTING
 #include "main.h"
 
-
 #define ONE_SECOND 1000 // 1000 miliseconds
 
 TFT_eSPI display = TFT_eSPI();
 
 Keyboard kbrd;
 ScheduleConf sch;
+tm iTime;
 
 Menu menu(&display, &kbrd);
 unsigned long lastTime = 0; // to mesure one seccond
@@ -15,6 +15,9 @@ unsigned long lastTime = 0; // to mesure one seccond
 void setup()
 {
     Serial.begin(115200);
+
+    display.begin();
+    display.fillScreen(TFT_BLACK);
 
     sch.init();
     schedule_t s_val;
@@ -26,11 +29,19 @@ void setup()
             Serial.println("Error loading data to the menus");
         }
     }
-
+    // if there is a time provider (NTP or RTC set the time in the menu)
+    // TODO: Change this code to get the values from the time provider.
+    iTime.tm_year = 2025 - 1900;
+    iTime.tm_mday = 19;
+    iTime.tm_mon = 1;
+    iTime.tm_hour = 22;
+    iTime.tm_min = 20;
+    iTime.tm_sec = 50;
+    menu.setTime(iTime);
 }
 
 void loop()
-{   
+{
 
     /* Enter in this if every second*/
     if (millis() - lastTime >= ONE_SECOND)
@@ -55,6 +66,8 @@ void loop()
                 // save in memory
                 sch.setConf(i, &s);
             }
+            iTime = menu.getTime();
+            Serial.println(&iTime, "%H:%M:%S %A, %B %d %Y");
         }
 
         lastTime = millis();
