@@ -2,9 +2,6 @@
 
 Menu::Menu(TFT_eSPI *D, Keyboard *b)
 {
-  // Adafruit_ST7735 Display(CS_PIN, DC_PIN, MOSI, CLK, 0); // Display object
-  // Buttons btn;
-
   Display = D;
   btn = b;
 
@@ -145,16 +142,16 @@ void Menu::ProcessZone(int zone)
   // draw the main menu
   switch (zone)
   {
-  case 0:
+  case ZONE_1:
     zMenu = Zone1Menu;
     break;
-  case 1:
+  case ZONE_2:
     zMenu = Zone2Menu;
     break;
-  case 2:
+  case ZONE_3:
     zMenu = Zone3Menu;
     break;
-  case 3:
+  case ZONE_4:
     zMenu = Zone4Menu;
     break;
   default:
@@ -319,6 +316,7 @@ void Menu::ProcessMainMenu()
       }
       if (MainMenuOption == MenuOptionOnOff)
       {
+        // if select to disable the system, grey out other options
         if (MainMenu->getEnableState(MenuOptionAuto))
         {
           MainMenu->disable(MenuOptionAuto);

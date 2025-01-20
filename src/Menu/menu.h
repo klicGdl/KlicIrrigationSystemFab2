@@ -15,8 +15,6 @@
 #define MOSI 23
 #define CLK 18
 
-#define MAX_ZONES 4
-
 #define ROW_HEIGHT 20
 #define DATA_COLUMN 100
 #define TITLE_HEIGHT 20
@@ -50,6 +48,14 @@ enum
     PIR_STOP
 };
 
+enum
+{
+    ZONE_1,
+    ZONE_2,
+    ZONE_3,
+    ZONE_4,
+    MAX_ZONES
+};
 
 class Menu
 {

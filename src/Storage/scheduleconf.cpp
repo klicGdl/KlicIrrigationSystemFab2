@@ -17,7 +17,7 @@ void ScheduleConf::init()
     if (!store->isKey(this->_zoneNames[0].c_str()))
     {
         // if not data saved, save default values
-        for (int i = 0; i < MAX_ZONES; i++)
+        for (int i = 0; i < MAXZONES; i++)
         {
             store->putBytes(this->_zoneNames[i].c_str(), &this->_zones[i], sizeof(schedule_t));
         }
@@ -25,7 +25,7 @@ void ScheduleConf::init()
     else
     {
         // Data exist, store it in RAM
-        for (int i = 0; i < MAX_ZONES; i++)
+        for (int i = 0; i < MAXZONES; i++)
         {
             store->getBytes(this->_zoneNames[i].c_str(), &this->_zones[i], sizeof(schedule_t));
         }
