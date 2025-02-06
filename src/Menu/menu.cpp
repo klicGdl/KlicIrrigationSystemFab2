@@ -42,7 +42,7 @@ void Menu::ProcessTimeAndDate()
   Display->fillScreen(MENU_BACKGROUND);
 
   TimeDateMenu->draw();
-  
+
   // run the processing loop until user move selector to title bar (which becomes exit)
   // and selectes it
   while (TimeandDateMenuOption != 0)
@@ -75,9 +75,7 @@ void Menu::ProcessTimeAndDate()
   this->timeAndDate.tm_mday = TimeDateMenu->value[dayID];
   this->timeAndDate.tm_mon = TimeDateMenu->value[monthID];
   this->timeAndDate.tm_year = TimeDateMenu->value[yearID] - 1900;
-  
 }
-
 
 void Menu::ProcessSensors()
 {
@@ -232,44 +230,33 @@ void Menu::ProcessConfMenu()
     // but wait...the user pressed the button on the encoder
     if (btn->button_Enter.pressed())
     {
-
       ConfMenuOption = ConfigurationMenu->selectRow();
       if (ConfMenuOption == ConfigurationZone1)
-      { // Zone1 item
-        ProcessZone(0);
-        Display->fillScreen(MENU_BACKGROUND);
-        ConfigurationMenu->draw();
+      {
+        ProcessZone(ZONE_1);
       }
-      if (ConfMenuOption == ConfigurationZone2)
-      { // Zone2 item
-        ProcessZone(1);
-        Display->fillScreen(MENU_BACKGROUND);
-        ConfigurationMenu->draw();
+      else if (ConfMenuOption == ConfigurationZone2)
+      {
+        ProcessZone(ZONE_2);
       }
-      if (ConfMenuOption == ConfigurationZone3)
-      { // Zone3 item
-        ProcessZone(2);
-        Display->fillScreen(MENU_BACKGROUND);
-        ConfigurationMenu->draw();
+      else if (ConfMenuOption == ConfigurationZone3)
+      {
+        ProcessZone(ZONE_3);
       }
-      if (ConfMenuOption == ConfigurationZone4)
-      { // Zone4 item
-        ProcessZone(3);
-        Display->fillScreen(MENU_BACKGROUND);
-        ConfigurationMenu->draw();
+      else if (ConfMenuOption == ConfigurationZone4)
+      {
+        ProcessZone(ZONE_4);
       }
-      if (ConfMenuOption == ConfigurationSensors)
-      { // Sensors item
+      else if (ConfMenuOption == ConfigurationSensors)
+      {
         ProcessSensors();
-        Display->fillScreen(MENU_BACKGROUND);
-        ConfigurationMenu->draw();
       }
-      if (ConfMenuOption == ConfigurationTimeandDate)
-      { // Time and Date
+      else if (ConfMenuOption == ConfigurationTimeandDate)
+      {
         ProcessTimeAndDate();
-        Display->fillScreen(MENU_BACKGROUND);
-        ConfigurationMenu->draw();
       }
+      Display->fillScreen(MENU_BACKGROUND);
+      ConfigurationMenu->draw();
     }
   }
 }
@@ -344,10 +331,8 @@ void Menu::ProcessMainMenu()
 void Menu::MenusSetup()
 {
 
-  // Display->begin();
-  // Display->initR(INITR_BLACKTAB);
   Display->begin();
-  Display->fillScreen(TFT_BGR); // ST7735_BLACK);
+  Display->fillScreen(TFT_BGR);
   Display->setRotation(0);
   Display->setTextSize(1);
   /*
@@ -550,10 +535,10 @@ int Menu::setZoneConf(int zone, uint8_t days, uint8_t hour, uint8_t min, uint16_
   this->minute[zone] = min;
   this->duration[zone] = dur;
   // the sensors as linked to the first  zone
-  this->_pirSensor = pir;
-  this->_humiditySensor = humidity;
-  this->_rainSensor = rain;
-
+  // check for bad configuration
+  this->_pirSensor = pir > 2 ? 0 : pir;
+  this->_humiditySensor = (bool)humidity;
+  this->_rainSensor = (bool)rain;
   return 0;
 }
 
