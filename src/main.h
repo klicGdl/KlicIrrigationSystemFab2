@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
-#include "Display/IDisplay.h"
-#include "Display/DisplaySSD1306.h"
-#include "Display/DisplayST7735.h"
+#include "Display/DisplayConsts.h"
 #include "Storage/scheduleconf.h"
+#include "buttons/keyboard.h"
+#include "Menu/menu.h"
+#include <Adafruit_SSD1306.h>
