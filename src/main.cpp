@@ -2,7 +2,7 @@
 #include "main.h"
 
 #define ONE_SECOND 1000 // 1000 miliseconds
-
+#define BOARD_LED           2
 TFT_eSPI display = TFT_eSPI();
 
 Keyboard kbrd;
@@ -15,9 +15,9 @@ unsigned long lastTime = 0; // to mesure one seccond
 void setup()
 {
     Serial.begin(115200);
-
+    Serial1.begin(115200);
     display.begin();
-    display.fillScreen(TFT_BLACK);
+    display.fillScreen(TFT_RED);
 
     sch.init();
     schedule_t s_val;
@@ -38,14 +38,20 @@ void setup()
     iTime.tm_min = 20;
     iTime.tm_sec = 50;
     menu.setTime(iTime);
+    pinMode(2, OUTPUT);
 }
 
 void loop()
 {
-
+    //digitalWrite(BOARD_LED, 1);
+    //delay(200);
+    //digitalWrite(BOARD_LED, 0);
+    //delay(200);
     /* Enter in this if every second*/
     if (millis() - lastTime >= ONE_SECOND)
     {
+        Serial.println("bip");
+        // digitalWrite(BOARD_LED, ~digitalRead(BOARD_LED));
         // come here every second
         kbrd.update_buttons();
 
