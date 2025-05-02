@@ -48,6 +48,9 @@ void loop()
     //digitalWrite(BOARD_LED, 0);
     //delay(200);
     /* Enter in this if every second*/
+
+    Sensor DummyObj();
+
     if (millis() - lastTime >= ONE_SECOND)
     {
         Serial.println("bip");
