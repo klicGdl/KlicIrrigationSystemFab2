@@ -41,6 +41,9 @@ void setup()
     pinMode(2, OUTPUT);
 }
 
+
+Sensor RainSensor(36);
+
 void loop()
 {
     //digitalWrite(BOARD_LED, 1);
@@ -49,11 +52,11 @@ void loop()
     //delay(200);
     /* Enter in this if every second*/
 
-    Sensor DummyObj();
 
     if (millis() - lastTime >= ONE_SECOND)
     {
-        Serial.println("bip");
+        Serial.println("/n Rain Sensor value");
+        Serial.println(RainSensor.ReadSensor());
         // digitalWrite(BOARD_LED, ~digitalRead(BOARD_LED));
         // come here every second
         kbrd.update_buttons();
