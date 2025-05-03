@@ -28,9 +28,9 @@ void Keyboard::setup_buttons()
 
 void Keyboard::update_buttons()
 {
-    //button_Up.update();
-    //button_Down.update();
-    //button_Right.update();
-    //button_Left.update();
+    button_Up.update();
+    button_Down.update();
+    button_Right.update();
+    button_Left.update();
     button_Enter.update();
 }

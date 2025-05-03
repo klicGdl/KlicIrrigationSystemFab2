@@ -2,7 +2,7 @@
  * Project: Klic Smart Irrigation System
  * 
  * Description:
- *    Module to read rain sensors potentiometer based (analog and digital inputs) 
+ *    Generic Sensor implementation
  *    
  * 
  * License:
@@ -11,53 +11,38 @@
  *    without explicit permission from the author
  * 
  * Usage:
- *    Rainsensor module with output digital and analog input formats
- *    a voltage comparator is widely use
- * 
- * TODO:
  *    
+ *    
+ * 
  ******************************************************************************/
 
  #include <Arduino.h>
 
+
 enum class SensorStatus {
-  NotInitialized,
-  Ready,
-  Error,
-  AwaitingData
+  AwaitingData,
+  Valid,
+  Invalid
 };
+
 
 class Sensor {
-
-  int Value;
-  SensorStatus ValidReading;
-  int AnalogInPin;
-
+  protected:
+      int value;
+      SensorStatus validReading;
+  
   public:
-
-  Sensor(uint16_t Pin) {
-    
-    AnalogInPin = Pin;
-
-    ValidReading = SensorStatus::AwaitingData;
-
-    //
-    // Set Desired pin for reading
-    //
-    pinMode(Pin, INPUT);
-
-    //
-    // 10 bits ADC counter 0 <= counts < 1023
-    //
-    analogReadResolution(10);
-    
-    //
-    // Max Input voltage
-    //
-    analogSetAttenuation(ADC_11db);
-  }
-
-  uint16_t ReadSensor (void) {
-      return analogRead (AnalogInPin);
-  }
-};
+      virtual ~Sensor() = default;
+  
+      Sensor() : value(0), validReading(SensorStatus::AwaitingData) {}
+  
+      virtual uint16_t ReadSensor() = 0;
+  
+      SensorStatus getStatus() const {
+          return validReading;
+      }
+  
+      int getValue() const {
+          return value;
+      }
+  };

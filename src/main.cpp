@@ -1,21 +1,22 @@
 #ifndef PIO_UNIT_TESTING
 #include "main.h"
 
-#define ONE_SECOND 1000 // 1000 miliseconds
-#define BOARD_LED           2
+#define ONE_SECOND        1000 // 1000 miliseconds
+#define BOARD_LED            2
+#define RAIN_SENSOR_PIN     36
 TFT_eSPI display = TFT_eSPI();
 
 Keyboard kbrd;
 ScheduleConf sch;
 tm iTime;
-
+AnalogSensor RainSensor(RAIN_SENSOR_PIN);
 Menu menu(&display, &kbrd);
+
 unsigned long lastTime = 0; // to mesure one seccond
 
 void setup()
 {
     Serial.begin(115200);
-    Serial1.begin(115200);
     display.begin();
     display.fillScreen(TFT_RED);
 
@@ -41,18 +42,12 @@ void setup()
     pinMode(2, OUTPUT);
 }
 
-
-Sensor RainSensor(36);
+uint16_t LedState = 0;
+uint16_t Task2Timer = 0;
 
 void loop()
 {
-    //digitalWrite(BOARD_LED, 1);
-    //delay(200);
-    //digitalWrite(BOARD_LED, 0);
-    //delay(200);
-    /* Enter in this if every second*/
-
-
+    
     if (millis() - lastTime >= ONE_SECOND)
     {
         Serial.println("/n Rain Sensor value");
@@ -83,6 +78,15 @@ void loop()
         }
 
         lastTime = millis();
+    }
+
+    //
+    // Heartbeat LED lets user know firmware is running
+    //
+    if (millis() - Task2Timer >= 500) {
+        LedState ^= 1;
+        digitalWrite(BOARD_LED, LedState);
+        Task2Timer = millis();
     }
 }
 
