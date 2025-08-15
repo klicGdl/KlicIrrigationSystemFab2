@@ -14,6 +14,7 @@
 #include <Arduino.h>
 #include "Sensor.h"
 
+#define ADC_RESOLUTION 10
  class AnalogSensor : public Sensor {
   private:
       int analogInPin;
@@ -28,7 +29,7 @@
           //
           // ADC resultion
           //
-          analogReadResolution(10);
+          analogReadResolution(ADC_RESOLUTION);
           
           //
           // Vref 0 - 3.3
