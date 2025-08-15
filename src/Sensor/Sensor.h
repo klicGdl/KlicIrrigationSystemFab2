@@ -15,8 +15,8 @@
  *    
  * 
  ******************************************************************************/
-
- #include <Arduino.h>
+#pragma once
+#include <Arduino.h>
 
 
 enum class SensorStatus {
