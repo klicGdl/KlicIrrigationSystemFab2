@@ -1,5 +1,7 @@
 #ifndef PIO_UNIT_TESTING
 #include "main.h"
+#include "utils/logger.h"
+#include "wifi/WiFiDriver.h"
 
 #define ONE_SECOND        1000
 
@@ -9,6 +11,7 @@ ScheduleConf sch;
 tm iTime;
 AnalogSensor RainSensor(RAIN_SENSOR_PIN);
 Menu menu(&display, &kbrd);
+SysLogger logger(&Serial);
 
 void TaskSensorMenu(void *pvParameters) {
     for (;;) {
@@ -43,6 +46,7 @@ void setup()
     Serial.begin(115200);
     display.begin();
     display.fillScreen(TFT_NAVY);
+    WiFiDriver::WiFiInitialize();
 
     sch.init();
     schedule_t s_val;
