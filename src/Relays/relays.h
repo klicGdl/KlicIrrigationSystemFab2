@@ -52,13 +52,14 @@ private:
 class RelayManager
 {
 public:
-    // Adds a relay at yhe end of the vector and initializes it.
+    // Adds a relay at the end of the vector and initializes it.
     // Returns its index.
-    uint8_t addRelay(int pin, bool activeLow = false, bool initialOn = false)
+    uint8_t addRelay(int pin, bool activeLow = false, bool initialOn = false, bool master = false)
     {
         _relays.emplace_back(pin, activeLow);
         _relays.back().init(initialOn);
         _isThereaRelayOn = false;
+        if (master) { _masterRelay = true; _thisIsTheMaster = _relays.size() - 1; }
         return _relays.size() - 1;
     }
 
@@ -70,6 +71,11 @@ public:
         {
             return;
         }
+        if (_masterRelay) 
+        { 
+            _relays.at(_thisIsTheMaster).on();
+            delay(10);
+        }
         _relays.at(i).on();
         _isThereaRelayOn = true;
     }
@@ -78,6 +84,10 @@ public:
     {
         _relays.at(i).off();
         _isThereaRelayOn = false;
+        if (_masterRelay)
+        {
+            _relays.at(_thisIsTheMaster).off();
+        }
     }
 
     // returns true if the relay is on
@@ -90,4 +100,6 @@ private:
     // use a vector to store the relays
     std::vector<Relay> _relays;
     bool _isThereaRelayOn;
+    bool _masterRelay;
+    bool _thisIsTheMaster;
 };
