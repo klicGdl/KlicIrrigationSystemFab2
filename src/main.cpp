@@ -57,16 +57,16 @@ void TaskSensorMenu(void *pvParameters)
         {
             menu.MenusSetup();
             schedule_t s;
-            for (int i = 0; i < MAX_ZONES; i++)
+            for (int zone = 0; zone < MAX_ZONES; zone++)
             {
-                s.days = menu.getZoneConfdays(i);
-                s.hour = menu.getZoneConfhour(i);
-                s.minute = menu.getZoneConfmin(i);
-                s.duration = menu.getZoneConfduration(i);
+                s.days = menu.getZoneConfdays(zone);
+                s.hour = menu.getZoneConfhour(zone);
+                s.minute = menu.getZoneConfmin(zone);
+                s.duration = menu.getZoneConfduration(zone);
                 s.humidity = menu.getZoneConfHumidity();
                 s.rain = menu.getZoneConfRain();
                 s.pir = menu.getZoneConfPir();
-                sch.setConf(i, &s);
+                sch.setConf(zone, &s);
             }
             iTime = menu.getTime();
             Serial.println(&iTime, "%H:%M:%S %A, %B %d %Y");
