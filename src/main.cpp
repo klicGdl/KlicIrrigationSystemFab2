@@ -19,32 +19,39 @@ SysLogger logger(&Serial);
 void TaskCheckValvesForAction(void *pvParameters)
 {
     schedule_t iSch;
-    for (uint8_t zone = 0; zone < MAX_ZONES; zone++)
+    while (true)
     {
-        iSch = sch.getConf(zone);
-        // if the relay is on, then check if needs to turn it off
-        if (iRelays.status(zone))
         {
-            if (iRelays.timeOnInSeconds(zone) >= (uint32_t)iSch.duration)
+            /* code */
+        }
+
+        for (uint8_t zone = 0; zone < MAX_ZONES; zone++)
+        {
+            iSch = sch.getConf(zone);
+            // if the relay is on, then check if needs to turn it off
+            if (iRelays.status(zone))
             {
-                iRelays.off(zone);
+                if (iRelays.timeOnInSeconds(zone) >= (uint32_t)iSch.duration)
+                {
+                    iRelays.off(zone);
+                }
+                else
+                {
+                    // if there is one relay in On state, do not check other ones
+                    // because they are mutually excluded
+                    return;
+                }
             }
-            else
+            // Get here either because there was not a relay On or has just turn it off
+            if (RainSensor.ReadSensor())
             {
-                // if there is one relay in On state, do not check other ones
-                // because they are mutually excluded
+                // Sensor detected rain, no need to do anything
                 return;
             }
+            // TODO: Need a time provider in orde to check if it is time to turn a relay on
         }
-        // Get here either because there was not a relay On or has just turn it off
-        if (RainSensor.ReadSensor())
-        {
-            // Sensor detected rain, no need to do anything
-            return;
-        }
-        // TODO: Need a time provider in orde to check if it is time to turn a relay on
+        vTaskDelay(pdMS_TO_TICKS(ONE_SECOND));
     }
-    vTaskDelay(pdMS_TO_TICKS(ONE_SECOND)); 
 }
 
 void TaskSensorMenu(void *pvParameters)
