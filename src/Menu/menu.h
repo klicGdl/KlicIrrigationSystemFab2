@@ -107,6 +107,7 @@ private:
     bool _rainSensor = false;
     uint8_t _pirSensor = 0;
     tm timeAndDate;
+    bool systemEnable = true; // this flag is to disable the system from the menu
 
 
 
@@ -148,4 +149,5 @@ public:
     uint8_t getZoneConfPir();
     void setTime(tm t);
     tm getTime();
+    bool isSystemEnable();
 };

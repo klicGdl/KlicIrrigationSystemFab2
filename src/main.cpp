@@ -10,19 +10,38 @@ Keyboard kbrd;
 ScheduleConf sch;
 tm iTime;
 RelayManager iRelays;
+TimeService iTimeProvider;
 AnalogSensor HumiditySensor(RAIN_SENSOR_PIN);
 DigitalSensor RainSensor(RAIN_SENSOR_PIN);
 Menu menu(&display, &kbrd);
 SysLogger logger(&Serial);
 
+bool CheckIfIsTime(schedule_t s, tm t)
+{
+    if (((0x40 >> t.tm_wday) & s.days) &&
+        (t.tm_hour == s.hour) &&
+        (t.tm_min == s.minute))
+    {
+        return true;
+    }
+    return false;
+}
+
 // Verify if there is an action to take, either if is it time to turn on  or off a relay
 void TaskCheckValvesForAction(void *pvParameters)
 {
     schedule_t iSch;
+    time_t rawTime;
     while (true)
     {
+        if (!menu.isSystemEnable())
         {
-            /* code */
+            // if the system is disable, no need to turn off all and do nothing else
+            for (uint8_t zone = 0; zone < MAX_ZONES; zone++)
+            {
+                iRelays.off(zone);
+            }
+            continue;
         }
 
         for (uint8_t zone = 0; zone < MAX_ZONES; zone++)
@@ -39,17 +58,27 @@ void TaskCheckValvesForAction(void *pvParameters)
                 {
                     // if there is one relay in On state, do not check other ones
                     // because they are mutually excluded
-                    return;
+                    continue;
                 }
             }
             // Get here either because there was not a relay On or has just turn it off
             if (RainSensor.ReadSensor())
             {
                 // Sensor detected rain, no need to do anything
-                return;
+                break;
             }
-            // TODO: Need a time provider in orde to check if it is time to turn a relay on
+            // Check if it is time to turn a relay on
+            iTime = iTimeProvider.getTimeDate();
+            if (CheckIfIsTime(iSch, iTime))
+            {
+                iRelays.on(zone);
+                //  if already tunr on, no need to check for others
+                break;
+            }
         }
+        Serial.println(&iTime, "%H:%M:%S %A, %B %d %Y");
+
+
         vTaskDelay(pdMS_TO_TICKS(ONE_SECOND));
     }
 }
@@ -58,13 +87,15 @@ void TaskSensorMenu(void *pvParameters)
 {
     for (;;)
     {
-        Serial.println("\nRain Sensor value");
-        Serial.println(RainSensor.ReadSensor());
+        // Serial.println("\nRain Sensor value");
+        // Serial.println(RainSensor.ReadSensor());
 
         kbrd.update_buttons();
 
         if (kbrd.button_Enter.pressed())
         {
+            iTime = iTimeProvider.getTimeDate();
+            menu.setTime(iTime);
             menu.MenusSetup();
             schedule_t s;
             for (int zone = 0; zone < MAX_ZONES; zone++)
@@ -92,6 +123,7 @@ void setup()
     display.begin();
     display.fillScreen(TFT_NAVY);
     WiFiDriver::WiFiInitialize();
+    iTimeProvider.init();
 
     sch.init();
     schedule_t s_val;
@@ -104,24 +136,20 @@ void setup()
         }
     }
 
-    iTime.tm_year = 2025 - 1900;
-    iTime.tm_mday = 19;
-    iTime.tm_mon = 1;
-    iTime.tm_hour = 22;
-    iTime.tm_min = 20;
-    iTime.tm_sec = 50;
+    iTime = iTimeProvider.getTimeDate();
     menu.setTime(iTime);
 
     // add all the relays into the RelayManager vector
-    iRelays.addRelay(RELAY1);
-    iRelays.addRelay(RELAY2);
-    iRelays.addRelay(RELAY3);
-    iRelays.addRelay(RELAY4);
-    iRelays.addRelay(RELAY5, false, false, true); // this is the master relay that will provide the output voltage for the others
+    iRelays.addRelay(RELAY1_PIN) << EndLine;
+    iRelays.addRelay(RELAY2_PIN) << EndLine;
+    iRelays.addRelay(RELAY3_PIN) << EndLine;
+    iRelays.addRelay(RELAY4_PIN) << EndLine;
+    // Parameters: Pin, activelow, initialOn, master
+    iRelays.addRelay(RELAY5_PIN, true, false, true); // this is the master relay that will provide the output voltage for the others
 
     // Create FreeRTOS tasks
     xTaskCreatePinnedToCore(TaskSensorMenu, "SensorTask", 4096, NULL, 1, NULL, 1);
-    xTaskCreatePinnedToCore(TaskCheckValvesForAction, "Turn on/off Valves", 2048, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(TaskCheckValvesForAction, "Turn on/off Valves", 4096 /*2048*/, NULL, 1, NULL, 1);
 }
 
 void loop()

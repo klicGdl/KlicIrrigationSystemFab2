@@ -73,7 +73,7 @@ void Menu::ProcessTimeAndDate()
   this->timeAndDate.tm_min = TimeDateMenu->value[minID];
   this->timeAndDate.tm_sec = TimeDateMenu->value[secID];
   this->timeAndDate.tm_mday = TimeDateMenu->value[dayID];
-  this->timeAndDate.tm_mon = TimeDateMenu->value[monthID];
+  this->timeAndDate.tm_mon = TimeDateMenu->value[monthID] - 1;
   this->timeAndDate.tm_year = TimeDateMenu->value[yearID] - 1900;
 }
 
@@ -308,11 +308,13 @@ void Menu::ProcessMainMenu()
         {
           MainMenu->disable(MenuOptionAuto);
           MainMenu->disable(MenuOptionConf);
+          this->systemEnable = false;
         }
         else
         {
           MainMenu->enable(MenuOptionAuto);
           MainMenu->enable(MenuOptionConf);
+          this->systemEnable = true;
         }
         MainMenu->draw();
       }
@@ -505,7 +507,7 @@ void Menu::MenusSetup()
   minID = TimeDateMenu->addNI("Minute", timeAndDate.tm_min, 0, 59, 1, 0, NULL);
   secID = TimeDateMenu->addNI("Seconds", timeAndDate.tm_sec, 0, 59, 1, 0, NULL);
   dayID = TimeDateMenu->addNI("Day", timeAndDate.tm_mday, 1, 31, 1, 0, NULL);
-  monthID = TimeDateMenu->addNI("Month", timeAndDate.tm_mon, 1, 12, 1, 0, NULL);
+  monthID = TimeDateMenu->addNI("Month", timeAndDate.tm_mon + 1, 1, 12, 1, 0, NULL);
   yearID = TimeDateMenu->addNI("Year", timeAndDate.tm_year + 1900, 2025, 2040, 1, 0, NULL);
 
   TimeDateMenu->setMenuBarMargins(0, Display->width(), BORDERRADIUS, BORDERTHICKNESS);
@@ -607,4 +609,9 @@ void Menu::setTime(tm t)
 tm Menu::getTime()
 {
   return this->timeAndDate;
+}
+
+bool Menu::isSystemEnable()
+{
+  return this->systemEnable;
 }

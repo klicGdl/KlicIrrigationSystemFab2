@@ -22,6 +22,7 @@ public:
     {
         write(true);
         _timeOn = millis();
+        Serial.printf("Pin %d, active = %d, value %d\n",_pin, _activeLow, (_activeLow ? !true : true));
     }
     void off()
     {
@@ -59,7 +60,11 @@ public:
         _relays.emplace_back(pin, activeLow);
         _relays.back().init(initialOn);
         _isThereaRelayOn = false;
-        if (master) { _masterRelay = true; _thisIsTheMaster = _relays.size() - 1; }
+        if (master) 
+        { 
+            _thisIsTheMaster = _relays.size() - 1; 
+            _masterRelay = true; 
+        }
         return _relays.size() - 1;
     }
 
@@ -101,5 +106,5 @@ private:
     std::vector<Relay> _relays;
     bool _isThereaRelayOn;
     bool _masterRelay;
-    bool _thisIsTheMaster;
+    int _thisIsTheMaster;
 };
