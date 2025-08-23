@@ -136,12 +136,6 @@ void setup()
         }
     }
 
-    // iTime.tm_year = 2025 - 1900;
-    // iTime.tm_mday = 19;
-    // iTime.tm_mon = 1;
-    // iTime.tm_hour = 22;
-    // iTime.tm_min = 20;
-    // iTime.tm_sec = 50;
     iTime = iTimeProvider.getTimeDate();
     menu.setTime(iTime);
 

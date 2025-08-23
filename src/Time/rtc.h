@@ -58,5 +58,5 @@ public:
 
         return t;
     }
-    bool isValid() { return rtc.isrunning(); }
+    bool isEnable() { return rtc.isrunning(); }
 };

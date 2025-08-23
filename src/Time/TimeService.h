@@ -30,7 +30,7 @@ private:
         {
             this->_updateRTC();
         }
-        else if (rtc.isValid())
+        else if (rtc.isEnable())
         {
             // if there is no NTP use RTC
             currentTime = rtc.get();
@@ -46,7 +46,7 @@ private:
     void _updateRTC()
     {
         // update RTC if exist
-        if (rtc.isValid())
+        if (rtc.isEnable())
         {
             rtc.set(&currentTime);
             this->valid = true;
@@ -67,7 +67,7 @@ public:
             // NTP is working
             this->_updateRTC();
         }
-        else if (rtc.isValid())
+        else if (rtc.isEnable())
         {
             // No NTP, but we do have RTC
             // Serial.println("Using RTC");
