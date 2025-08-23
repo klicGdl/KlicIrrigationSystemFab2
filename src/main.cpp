@@ -2,8 +2,10 @@
 #include "main.h"
 #include "utils/logger.h"
 #include "wifi/WiFiDriver.h"
-
+#include "Display/OledDisplay.h"
 #define ONE_SECOND 1000
+
+KlicSSD1306 display2(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 TFT_eSPI display = TFT_eSPI();
 Keyboard kbrd;
@@ -77,7 +79,8 @@ void TaskCheckValvesForAction(void *pvParameters)
             }
         }
         Serial.println(&iTime, "%H:%M:%S %A, %B %d %Y");
-
+        display2.drawFrame(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        display2.printTimeAndDate(&iTime);
 
         vTaskDelay(pdMS_TO_TICKS(ONE_SECOND));
     }
@@ -121,10 +124,12 @@ void setup()
 {
     Serial.begin(115200);
     display.begin();
-    display.fillScreen(TFT_NAVY);
+    display.fillScreen(TFT_BLACK);
+    display.setSwapBytes(true);
+    display.pushImage(0,0,128,160,bitmap_klic_logo_color);
     WiFiDriver::WiFiInitialize();
     iTimeProvider.init();
-
+    display2.init(SSD1306_SWITCHCAPVCC, DISPLAY_ADDR);
     sch.init();
     schedule_t s_val;
     for (int i = 0; i < MAX_ZONES; i++)
@@ -136,12 +141,6 @@ void setup()
         }
     }
 
-    // iTime.tm_year = 2025 - 1900;
-    // iTime.tm_mday = 19;
-    // iTime.tm_mon = 1;
-    // iTime.tm_hour = 22;
-    // iTime.tm_min = 20;
-    // iTime.tm_sec = 50;
     iTime = iTimeProvider.getTimeDate();
     menu.setTime(iTime);
 
@@ -152,6 +151,9 @@ void setup()
     iRelays.addRelay(RELAY4_PIN) << EndLine;
     // Parameters: Pin, activelow, initialOn, master
     iRelays.addRelay(RELAY5_PIN, true, false, true); // this is the master relay that will provide the output voltage for the others
+
+    display2.showLogo(3000);
+    display.fillScreen(TFT_BLACK);
 
     // Create FreeRTOS tasks
     xTaskCreatePinnedToCore(TaskSensorMenu, "SensorTask", 4096, NULL, 1, NULL, 1);

@@ -3,3 +3,5 @@
 
 // 'klic_logo', 128x64px
 extern const uint8_t bitmap_klic_logo[];
+// 128x160
+extern const unsigned short bitmap_klic_logo_color[];
