@@ -42,4 +42,9 @@
           validReading = SensorStatus::Valid;
           return value;
       }
+
+      uint8_t ReadSensorInPercentage() {
+        value = analogRead(analogInPin);
+        return map (value,0,pow(2,ADC_RESOLUTION),0,100);
+      }
   };

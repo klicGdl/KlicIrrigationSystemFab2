@@ -1,9 +1,9 @@
 #ifndef PIO_UNIT_TESTING
 #include "main.h"
-#include "utils/logger.h"
-#include "wifi/WiFiDriver.h"
 
 #define ONE_SECOND 1000
+
+KlicSSD1306 display2(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 TFT_eSPI display = TFT_eSPI();
 Keyboard kbrd;
@@ -31,7 +31,8 @@ bool CheckIfIsTime(schedule_t s, tm t)
 void TaskCheckValvesForAction(void *pvParameters)
 {
     schedule_t iSch;
-    time_t rawTime;
+    bool anyZoneIsOn = false;
+    uint8_t zone;
     while (true)
     {
         if (!menu.isSystemEnable())
@@ -44,7 +45,8 @@ void TaskCheckValvesForAction(void *pvParameters)
             continue;
         }
 
-        for (uint8_t zone = 0; zone < MAX_ZONES; zone++)
+        iTime = iTimeProvider.getTimeDate();
+        for (zone = 0; zone < MAX_ZONES; zone++)
         {
             iSch = sch.getConf(zone);
             // if the relay is on, then check if needs to turn it off
@@ -53,12 +55,13 @@ void TaskCheckValvesForAction(void *pvParameters)
                 if (iRelays.timeOnInSeconds(zone) >= (uint32_t)iSch.duration)
                 {
                     iRelays.off(zone);
+                    anyZoneIsOn = false;
                 }
                 else
                 {
                     // if there is one relay in On state, do not check other ones
                     // because they are mutually excluded
-                    continue;
+                    break;
                 }
             }
             // Get here either because there was not a relay On or has just turn it off
@@ -67,17 +70,22 @@ void TaskCheckValvesForAction(void *pvParameters)
                 // Sensor detected rain, no need to do anything
                 break;
             }
+            // if (HumiditySensor.ReadSensorInPercentage() >= 60)
+            // {
+            //     // if the humidity is higher than 60% do nothing
+            //     break;
+            // }
             // Check if it is time to turn a relay on
-            iTime = iTimeProvider.getTimeDate();
             if (CheckIfIsTime(iSch, iTime))
             {
                 iRelays.on(zone);
+                anyZoneIsOn = true;
                 //  if already tunr on, no need to check for others
                 break;
             }
         }
         Serial.println(&iTime, "%H:%M:%S %A, %B %d %Y");
-
+        display2.printCurrentState(&iTime,iSch.duration,zone,anyZoneIsOn);
 
         vTaskDelay(pdMS_TO_TICKS(ONE_SECOND));
     }
@@ -121,10 +129,18 @@ void setup()
 {
     Serial.begin(115200);
     display.begin();
-    display.fillScreen(TFT_NAVY);
+    display.fillScreen(TFT_BLACK);
+    display.setSwapBytes(true);
+    display.pushImage(0,0,128,160,bitmap_klic_logo_color);
     WiFiDriver::WiFiInitialize();
-    iTimeProvider.init();
-
+    while(!iTimeProvider.init())
+    {
+        // if there is not time provider, not need to continue.
+        // but keep trying
+        Serial.println("Not time no work");
+        delay(100);
+    }
+    display2.init(SSD1306_SWITCHCAPVCC, DISPLAY_ADDR);
     sch.init();
     schedule_t s_val;
     for (int i = 0; i < MAX_ZONES; i++)
@@ -146,6 +162,11 @@ void setup()
     iRelays.addRelay(RELAY4_PIN) << EndLine;
     // Parameters: Pin, activelow, initialOn, master
     iRelays.addRelay(RELAY5_PIN, true, false, true); // this is the master relay that will provide the output voltage for the others
+
+    // the logo will show for 3 seconds and then will fade-off
+    display2.showLogo(3000);
+    // turn off the TFT screen
+    display.fillScreen(TFT_BLACK);
 
     // Create FreeRTOS tasks
     xTaskCreatePinnedToCore(TaskSensorMenu, "SensorTask", 4096, NULL, 1, NULL, 1);
