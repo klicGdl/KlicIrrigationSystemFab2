@@ -13,7 +13,7 @@ private:
     bool _autoRefresh;
 
 public:
-    // Constructores que heredan de la clase padre
+    // Constructors
     KlicSSD1306(uint8_t w, uint8_t h, TwoWire *twi = &Wire, int8_t rst_pin = -1,
                 uint32_t clkDuring = 400000UL, uint32_t clkAfter = 100000UL)
         : Adafruit_SSD1306(w, h, twi, rst_pin, clkDuring, clkAfter)
@@ -23,7 +23,7 @@ public:
         _autoRefresh = true;
     }
 
-    // Constructor para SPI
+    // Constructor for SPI
     KlicSSD1306(uint8_t w, uint8_t h, SPIClass *spi, int8_t dc_pin,
                 int8_t rst_pin, int8_t cs_pin, uint32_t bitrate = 8000000UL)
         : Adafruit_SSD1306(w, h, spi, dc_pin, rst_pin, cs_pin, bitrate)
@@ -33,7 +33,7 @@ public:
         _autoRefresh = true;
     }
 
-    // Inicialización mejorada con configuración personalizada
+    // Initialization, begin the driver and clear the screan
     bool init(uint8_t switchvcc = SSD1306_SWITCHCAPVCC, uint8_t i2caddr = 0x3C,
               bool reset = true, bool periphBegin = true)
     {
