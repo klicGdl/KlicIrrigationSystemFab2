@@ -140,14 +140,24 @@ public:
     }
 
     // Print the time and date
-    void printTimeAndDate(tm * t)
+    void printCurrentState(tm * t, uint16_t duration, uint8_t zone, bool on)
     {
-        char buf[20];
+        char buf[30];
+        int16_t offset = -1;
         clearDisplay();
-        drawFrame(0,0,width(),height());
-        sprintf(buf,"%02d/%02d/%02d - %02d:%02d:%02d",t->tm_mday,t->tm_mon,t->tm_year,t->tm_hour,t->tm_min,t->tm_sec);
         setTextColor(WHITE);
-        printCentered(buf);
+        drawFrame(0,0,width(),height());
+        if(on)
+        {
+            sprintf(buf,"Zone %d",zone + 1); 
+            printCentered(buf,5);
+            printCentered("ON",16);
+            sprintf(buf,"for %d min",duration/60);
+            printCentered(buf,26);
+            offset = 40;
+        }
+        sprintf(buf,"%02d/%02d/%02d - %02d:%02d:%02d",t->tm_mday,t->tm_mon,t->tm_year,t->tm_hour,t->tm_min,t->tm_sec);
+        printCentered(buf,offset);
         display();
     }
 };

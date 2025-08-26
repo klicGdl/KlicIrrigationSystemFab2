@@ -57,7 +57,7 @@ public:
     TimeService() {}
     ~TimeService(){}
 
-    void init()
+    bool init()
     {
         ntp.init();
         rtc.init();
@@ -66,11 +66,13 @@ public:
         {
             // NTP is working
             this->_updateRTC();
+            Serial.println("Using NTP");
+            this->valid = true;
         }
         else if (rtc.isValid())
         {
             // No NTP, but we do have RTC
-            // Serial.println("Using RTC");
+            Serial.println("Using RTC");
             this->valid = true;
         }
         else
@@ -79,6 +81,7 @@ public:
             Serial.println("No time provider available.");
             this->valid = false;
         }
+        return this->valid;
     }
 
     tm getTimeDate()
