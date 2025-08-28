@@ -37,8 +37,8 @@ bool WiFiInitialize(void) {
 
   // will try to connect when it has saved credentials
   // if it fails will start the access point
-  bool connected = WiFiDriver::_wm.autoConnect(WiFiDriver::Config::WIFI_SSID,
-                                               WiFiDriver::Config::WIFI_PASS);
+  bool connected = WiFiDriver::_wm.autoConnect(WiFiDriver::Config::WIFI_SSID);
+
   if (!connected) {
     logger << LOG_ERROR << "WiFi AutoConnect failed to: "
            << WiFiDriver::_wm.getWiFiSSID(false)
