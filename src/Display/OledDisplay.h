@@ -156,7 +156,7 @@ public:
             printCentered(buf,26);
             offset = 40;
         }
-        sprintf(buf,"%02d/%02d/%02d - %02d:%02d:%02d",t->tm_mday,t->tm_mon,t->tm_year,t->tm_hour,t->tm_min,t->tm_sec);
+        sprintf(buf,"%02d/%02d/%02d - %02d:%02d:%02d",t->tm_mday,(t->tm_mon + 1),(t->tm_year - 100),t->tm_hour,t->tm_min,t->tm_sec);
         printCentered(buf,offset);
         display();
     }
