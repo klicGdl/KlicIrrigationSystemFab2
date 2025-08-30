@@ -15,6 +15,7 @@ AnalogSensor HumiditySensor(RAIN_SENSOR_PIN);
 DigitalSensor RainSensor(RAIN_SENSOR_PIN);
 Menu menu(&display, &kbrd);
 SysLogger logger(&Serial);
+RTC_module rtc2;
 
 bool CheckIfIsTime(schedule_t s, tm t)
 {
@@ -133,6 +134,7 @@ void setup()
     display.setSwapBytes(true);
     display.pushImage(0,0,128,160,bitmap_klic_logo_color);
     WiFiDriver::WiFiInitialize();
+    rtc2.init_rtc();
     while(!iTimeProvider.init())
     {
         // if there is not time provider, not need to continue.
@@ -175,6 +177,7 @@ void setup()
 
 void loop()
 {
+    rtc2.PrintDateInSerial();
     // Nothing needed here anymore — everything is handled in FreeRTOS tasks
 }
 
