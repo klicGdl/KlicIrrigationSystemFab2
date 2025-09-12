@@ -12,4 +12,5 @@
 #include "utils/logger.h"
 #include "wifi/WiFiDriver.h"
 #include "Display/OledDisplay.h"
+#include "Presense/Presence_Module.h"
 

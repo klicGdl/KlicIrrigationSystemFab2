@@ -13,6 +13,7 @@ RelayManager iRelays;
 TimeService iTimeProvider;
 AnalogSensor HumiditySensor(RAIN_SENSOR_PIN);
 DigitalSensor RainSensor(RAIN_SENSOR_PIN);
+DigitalSensor PIR(PIR_SENSOR_PIN);
 Menu menu(&display, &kbrd);
 SysLogger logger(&Serial);
 
@@ -78,9 +79,14 @@ void TaskCheckValvesForAction(void *pvParameters)
             // Check if it is time to turn a relay on
             if (CheckIfIsTime(iSch, iTime))
             {
+                // If presence is detected but PIR mode is umbrella
+                
+                if(DetectMovement (PIR)) {
                 iRelays.on(zone);
                 anyZoneIsOn = true;
                 //  if already tunr on, no need to check for others
+                }
+
                 break;
             }
         }

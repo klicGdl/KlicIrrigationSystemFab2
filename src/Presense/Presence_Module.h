@@ -1,0 +1,3 @@
+#define SAMPLES_NUMBER  10
+#define UNITS_SCALE    100
+#define PIR_TOLERANCE  70
