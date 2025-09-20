@@ -158,10 +158,10 @@ void setup()
     menu.setTime(iTime);
 
     // add all the relays into the RelayManager vector
-    iRelays.addRelay(RELAY1_PIN) << EndLine;
-    iRelays.addRelay(RELAY2_PIN) << EndLine;
-    iRelays.addRelay(RELAY3_PIN) << EndLine;
-    iRelays.addRelay(RELAY4_PIN) << EndLine;
+    iRelays.addRelay(RELAY1_PIN);
+    iRelays.addRelay(RELAY2_PIN);
+    iRelays.addRelay(RELAY3_PIN);
+    iRelays.addRelay(RELAY4_PIN);
     // Parameters: Pin, activelow, initialOn, master
     iRelays.addRelay(RELAY5_PIN, true, false, true); // this is the master relay that will provide the output voltage for the others
 

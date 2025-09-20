@@ -1,5 +1,4 @@
 #include <Arduino.h>
-
 #include "Display/DisplayConsts.h"
 #include "Sensor/AnalogSensor.h"
 #include "Sensor/DigitalSensor.h"
