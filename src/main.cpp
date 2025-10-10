@@ -121,7 +121,7 @@ void TaskSensorMenu(void *pvParameters)
             Serial.println(&iTime, "%H:%M:%S %A, %B %d %Y");
         }
 
-        vTaskDelay(ONE_SECOND / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
 
